@@ -1,3 +1,13 @@
+这是我个人的fork版本，主要用于对nuScenes-KITTI转换的代码分析。
+This is my fork version which will be mainly used for nuScenes2KITTI code analysis.
+
+主要涉及到的代码为convert文件夹中的nu2kitti、scripts文件夹中的convert.py。
+I will mainly focus on convert/nusc2kitti.py and scripts/convert.py.
+
+
+
+
+
 # Train in Germany, Test in The USA: Making 3D Object Detectors Generalize
 
 This paper has been accpeted by Conference on Computer Vision and Pattern Recognition ([CVPR](http://cvpr2020.thecvf.com/)) 2020.
