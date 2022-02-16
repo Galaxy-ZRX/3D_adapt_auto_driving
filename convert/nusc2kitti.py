@@ -1,3 +1,14 @@
+"""
+本部分代码是nuScenes to KITTI的主要部分。主要参考了nuScenes官方的转换代码
+https://github.com/nutonomy/nuscenes-devkit/blob/master/python-sdk/nuscenes/scripts/export_kitti.py
+并且作了相应的修改
+我会标注与原代码中不一样的部分，即论文作者添加的部分。为了我自己能成功转换nusc2kitti，我会采用尽可能少但必要的代码。
+
+总体逻辑是，在scripts/convert.py中调用convert文件夹（以包的形式import），然后调用convert.nusc_to_kitti，对应到convert文件夹的__init__.py可以发现
+其实使用的就是convert文件夹的nusc2kitti.py（也就是本文件）中最底部的nusc_to_kitti函数，而该函数事实上就是创建一个KittiConverter类的对象并使用nuscenes_gt_to_kitti()命令
+所以本注释会重点看KittiConverter类以及nuscenes_gt_to_kitti()函数
+"""
+
 import os
 import json
 from typing import List, Dict, Any
@@ -30,6 +41,11 @@ CLASS_MAP = {
 
 
 def box_to_string(name, box, bbox_2d, truncation, occlusion, alpha):
+    """
+    作者自己定义的函数1，用于将bounding box转化为string，推测是用于写入label时使用
+    原代码使用了KITTIDB提供的box_to_string方法，这里作者自己重写了，有空对比一下区别。
+    总而言之，output是KITTI label文件中每一行标准的格式。
+    """
     v = np.dot(box.rotation_matrix, np.array([1, 0, 0]))
     yaw = -np.arctan2(v[2], v[0])
 
@@ -49,6 +65,12 @@ def box_to_string(name, box, bbox_2d, truncation, occlusion, alpha):
 
 
 def postprocessing(objs, height, width):
+    """
+    作者自己定义的函数2，用于在写入label文件的时候对obj进行后处理
+    原代码没有使用objects=[obj1, obj2,...]列表，而是直接遍历sample_annotation_token来读取写入所有的样本（208行）
+    作者则改为使用object列表来进行遍历
+    对照了一下大体逻辑都是一样的
+    """
     _map = np.ones((height, width), dtype=np.int8) * -1
     objs = sorted(objs, key=lambda x: x["depth"], reverse=True)
     for i, obj in enumerate(objs):
@@ -64,6 +86,12 @@ def postprocessing(objs, height, width):
 
 
 def project_to_2d(box, p_left, height, width):
+    """
+    作者自定义的函数3，同样用于写入label文件
+    源代码直接使用了KittiDB.project_kitti_box_to_image()方法
+    不知道为什么作者要自己定义
+    但是总之都是为了向label中写入2D bounding box的信息
+    """
     box = box.copy()
 
     # KITTI defines the box center as the bottom center of the object.
@@ -100,6 +128,11 @@ def project_to_2d(box, p_left, height, width):
     return {"bbox": bbox, "truncated": truncated}
 
 
+
+
+#正片开始！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+
 class KittiConverter:
     def __init__(self,
                  dataroot: str = "/home/yw763/driving/nuscenes",
@@ -107,7 +140,7 @@ class KittiConverter:
                  cam_name: str = 'CAM_FRONT',
                  lidar_name: str = 'LIDAR_TOP',
                  image_count: int = 10,
-                 nusc_version: str = 'v1.0-trainval',
+                 nusc_version: str = 'v1.0-trainval',   #这里如果用mini集的话记得改成'v1.0-mini'
                  split: str = 'train'):
         """
         :param nusc_kitti_dir: Where to write the KITTI-style annotations.
