@@ -4,9 +4,10 @@ This is my fork version which will be mainly used for nuScenes2KITTI code analys
 
 主要涉及到的代码为convert文件夹中的nu2kitti、scripts文件夹中的convert.py。
 
-I will mainly focus on convert/nusc2kitti.py and scripts/convert.py.
+I will mainly focus on [convert/nusc2kitti.py](https://github.com/Galaxy-ZRX/3D_adapt_auto_driving/blob/master/convert/nusc2kitti.py) and [scripts/convert.py](https://github.com/Galaxy-ZRX/3D_adapt_auto_driving/blob/master/scripts/convert.py).
 
-[convert/nusc2kitti.py](https://github.com/Galaxy-ZRX/3D_adapt_auto_driving/blob/master/convert/nusc2kitti.py)
+
+
 
 
 
